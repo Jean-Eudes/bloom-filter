@@ -27,8 +27,7 @@ impl<const COUNT: usize> BloomFilter<COUNT> {
     }
 
     fn contains(&self, data: &[u8]) -> bool {
-        let bits = self.compute_hash(data);
-        for pos in bits {
+        for pos in Self::compute_hash(self.k, data) {
             if !self.data[pos] {
                 return false;
             }
@@ -37,22 +36,17 @@ impl<const COUNT: usize> BloomFilter<COUNT> {
     }
 
     fn add(&mut self, data: &[u8]) {
-        let bits = self.compute_hash(data);
-
-        for pos in bits {
+        for pos in Self::compute_hash(self.k, data) {
             self.data[pos] = true;
         }
     }
 
-    fn compute_hash(&self, data: &[u8]) -> Vec<usize> {
-        let mut bits = Vec::new();
-        for i in 0..self.k {
+    fn compute_hash<'a>(k: u8, data: &'a [u8]) -> impl Iterator<Item = usize> + 'a {
+        (0..k).map(|i| {
             let hasher = SipHasher13::new_with_key(&[i; 16]);
             let hash = hasher.hash(data);
-            let bit = hash as usize % COUNT;
-            bits.push(bit);
-        }
-        bits
+            hash as usize % COUNT
+        })
     }
 }
 
