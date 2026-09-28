@@ -35,12 +35,7 @@ impl BloomFilter {
     }
 
     fn contains(&self, data: &[u8]) -> bool {
-        for pos in Self::compute_hash(self.k, self.m, data) {
-            if !self.data[pos] {
-                return false;
-            }
-        }
-        true
+        Self::compute_hash(self.k, self.m, data).all(|pos| self.data[pos])
     }
 
     fn add(&mut self, data: &[u8]) {
