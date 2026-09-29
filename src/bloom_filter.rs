@@ -40,17 +40,17 @@ impl BloomFilter {
 
     pub fn contains(&self, data: &[u8]) -> bool {
         Self::compute_hash(self.k, self.m, data).all(|pos| {
-            let current = pos / USIZE_LEN;
-            let donnee = self.data[current];
-            donnee & 1u64 << (pos % USIZE_LEN) != 0
+            let block_index = pos / USIZE_LEN;
+            let block = self.data[block_index];
+            block & 1u64 << (pos % USIZE_LEN) != 0
         })
     }
 
     pub fn add(&mut self, data: &[u8]) {
         for pos in Self::compute_hash(self.k, self.m, data) {
-            let current = pos / USIZE_LEN;
-            let donnee = self.data[current] | 1u64 << (pos % USIZE_LEN);
-            self.data[current] = donnee;
+            let block_index = pos / USIZE_LEN;
+            let new_block = self.data[block_index] | 1u64 << (pos % USIZE_LEN);
+            self.data[block_index] = new_block;
         }
     }
 
