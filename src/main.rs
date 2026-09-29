@@ -2,8 +2,10 @@ use std::fmt::Display;
 
 use siphasher::sip::SipHasher13;
 
+const USIZE_LEN: usize = 64;
+
 struct BloomFilter {
-    data: Vec<bool>,
+    data: Vec<u64>,
     k: u8,
     m: usize,
 }
@@ -11,7 +13,7 @@ struct BloomFilter {
 impl Display for BloomFilter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (index, &present) in self.data.iter().enumerate() {
-            if present {
+            if present != 0 {
                 write!(f, "{index},")?;
             }
         }
@@ -25,22 +27,30 @@ impl BloomFilter {
         let m = (-(n * p.ln()) / (2f64.ln().powi(2))).ceil();
         let k = ((m / n) * 2f64.ln()).ceil() as u8;
         let m = m as usize;
+        let size = m.div_ceil(USIZE_LEN);
         println!("k value is {k}");
         println!("m value is {m}");
+        println!("size value is {size}");
         BloomFilter {
-            data: vec![false; m],
+            data: vec![0; size],
             k,
             m,
         }
     }
 
     fn contains(&self, data: &[u8]) -> bool {
-        Self::compute_hash(self.k, self.m, data).all(|pos| self.data[pos])
+        Self::compute_hash(self.k, self.m, data).all(|pos| {
+            let current = pos / USIZE_LEN;
+            let donnee = self.data[current];
+            donnee & 1u64 << (pos % USIZE_LEN) != 0
+        })
     }
 
     fn add(&mut self, data: &[u8]) {
         for pos in Self::compute_hash(self.k, self.m, data) {
-            self.data[pos] = true;
+            let current = pos / USIZE_LEN;
+            let donnee = self.data[current] | 1u64 << (pos % USIZE_LEN);
+            self.data[current] = donnee;
         }
     }
 
@@ -55,7 +65,8 @@ impl BloomFilter {
 
 fn main() {
     println!("Hello, world!");
-    let mut bloom_filter: BloomFilter = BloomFilter::new(1_000_000, 0.01);
+    let mut bloom_filter: BloomFilter = BloomFilter::new(100, 0.01);
+    // let mut bloom_filter: BloomFilter = BloomFilter::new(10, 0.0001);
     bloom_filter.add(b"coucou");
     println!("{bloom_filter}");
     println!("data is contains {}", bloom_filter.contains(b"coucou"));
