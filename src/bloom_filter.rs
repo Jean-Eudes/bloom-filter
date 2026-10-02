@@ -12,12 +12,9 @@ pub struct BloomFilter {
 
 impl Display for BloomFilter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (index, &present) in self.data.iter().enumerate() {
-            if present != 0 {
-                write!(f, "{index},")?;
-            }
-        }
-        writeln!(f)
+        writeln!(f, "k value is {}", self.k)?;
+        writeln!(f, "m value is {}", self.m)?;
+        writeln!(f, "size value is {}", self.data.len())
     }
 }
 
@@ -28,9 +25,6 @@ impl BloomFilter {
         let k = ((m / n) * 2f64.ln()).ceil() as u8;
         let m = m as usize;
         let size = m.div_ceil(USIZE_LEN);
-        println!("k value is {k}");
-        println!("m value is {m}");
-        println!("size value is {size}");
         BloomFilter {
             data: vec![0; size],
             k,
