@@ -132,4 +132,17 @@ mod tests {
             "new function must return an error when p i greater than 1"
         );
     }
+
+    #[test]
+    fn should_guarantee_no_false_negative_after_add() {
+        // Given
+        let mut bloom_filter = BloomFilter::new(10, 0.1).expect("new with valid n and p must succeed");
+        let item = b"data";
+
+        // When
+        bloom_filter.add(item);
+
+        // Then
+        assert!(bloom_filter.contains(item));
+    }
 }
