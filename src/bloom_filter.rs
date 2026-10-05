@@ -30,8 +30,8 @@ impl Error for BloomError {}
 impl Display for BloomError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            BloomError::InvalidN(n) => writeln!(f, "n must be positive, got {n}"),
-            BloomError::InvalidP(p) => writeln!(f, "p must be between 0 and 1, got {p}"),
+            BloomError::InvalidN(n) => write!(f, "n must be positive, got {n}"),
+            BloomError::InvalidP(p) => write!(f, "p must be between 0 and 1, got {p}"),
         }
     }
 }
