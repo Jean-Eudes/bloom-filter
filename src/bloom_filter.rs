@@ -136,7 +136,8 @@ mod tests {
     #[test]
     fn should_guarantee_no_false_negative_after_add() {
         // Given
-        let mut bloom_filter = BloomFilter::new(10, 0.1).expect("new with valid n and p must succeed");
+        let mut bloom_filter =
+            BloomFilter::new(10, 0.1).expect("new with valid n and p must succeed");
         let item = b"data";
 
         // When
