@@ -146,4 +146,19 @@ mod tests {
         // Then
         assert!(bloom_filter.contains(item));
     }
+
+    #[test]
+    fn should_still_contain_element_after_duplicate_add() {
+        // Given
+        let mut bloom_filter =
+            BloomFilter::new(10, 0.1).expect("new with valid n and p must succeed");
+        let item = b"data";
+
+        // When
+        bloom_filter.add(item);
+        bloom_filter.add(item);
+
+        // Then
+        assert!(bloom_filter.contains(item));
+    }
 }
