@@ -161,4 +161,15 @@ mod tests {
         // Then
         assert!(bloom_filter.contains(item));
     }
+
+    #[test]
+    fn should_return_false_on_empty_filter() {
+        // Given
+        let bloom_filter =
+            BloomFilter::new(10, 0.1).expect("new with valid n and p must succeed");
+        let item = b"data";
+
+        // When / Then
+        assert!(!bloom_filter.contains(item));
+    }
 }
